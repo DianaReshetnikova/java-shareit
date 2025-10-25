@@ -57,8 +57,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateUserDataForUpdate(UserDto userDto, long userId ){
-        if(!userRepository.isExistUserById(userId))
+    private void validateUserDataForUpdate(UserDto userDto, long userId) {
+        if (!userRepository.isExistUserById(userId))
             throw new NotFoundException("Пользователь с id = " + userId + " не существует.");
 
         if (StringUtils.hasText(userDto.getEmail()) && !userDto.getEmail().contains("@")) {
