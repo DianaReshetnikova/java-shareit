@@ -3,6 +3,9 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exception.DuplicateException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -23,12 +26,12 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody UserDto newUser) {
+    public User createUser(@RequestBody UserDto newUser) throws DuplicateException, ValidationException {
         return userService.createUser(newUser);
     }
 
     @PatchMapping("/{userId}")
-    public User updateUser(@PathVariable("userId") Long userId, @RequestBody UserDto user) {
+    public User updateUser(@PathVariable("userId") Long userId, @RequestBody UserDto user) throws NotFoundException, ValidationException, DuplicateException {
         return userService.updateUser(userId, user);
     }
 
@@ -39,7 +42,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public User getUserById(@PathVariable("userId") Long id) {
+    public User getUserById(@PathVariable("userId") Long id) throws NotFoundException {
         return userService.getUserById(id);
     }
 }

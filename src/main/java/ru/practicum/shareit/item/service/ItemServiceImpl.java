@@ -18,13 +18,13 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Override
-    public List<ItemDto> getItemsByOwner(Long userId) {
+    public List<ItemDto> getItemsByOwner(Long userId) throws NotFoundException {
         validateUserById(userId);
         return itemRepository.getItemsByOwner(userId);
     }
 
     @Override
-    public ItemDto createItem(Long userId, ItemDto itemDto) {
+    public ItemDto createItem(Long userId, ItemDto itemDto) throws NotFoundException, ValidationException {
         validateUserById(userId);
         validateItemData(itemDto);
 
@@ -32,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(Long userId, long itemId, ItemDto itemDto) {
+    public ItemDto updateItem(Long userId, long itemId, ItemDto itemDto) throws NotFoundException, ValidationException {
         validateUserById(userId);
 
         if (!itemRepository.isExistItemById(itemId))
@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(long itemId) {
+    public ItemDto getItemById(long itemId) throws NotFoundException {
         return itemRepository.getItemById(itemId).orElseThrow(() -> new NotFoundException("Вещь с id = " + itemId + " не найдена."));
     }
 
@@ -57,12 +57,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    private void validateUserById(Long userId) {
+    private void validateUserById(Long userId) throws NotFoundException {
         if (userId == null || !userRepository.isExistUserById(userId))
             throw new NotFoundException("Пользователь с id = " + userId + " не найден.");
     }
 
-    private void validateItemData(ItemDto itemDto) {
+    private void validateItemData(ItemDto itemDto) throws ValidationException {
         if (!StringUtils.hasText(itemDto.getName())
                 || !StringUtils.hasText(itemDto.getDescription())
                 || itemDto.getAvailable() == null)

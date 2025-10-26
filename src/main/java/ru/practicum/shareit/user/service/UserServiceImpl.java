@@ -23,19 +23,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(UserDto userDto) {
+    public User createUser(UserDto userDto) throws DuplicateException, ValidationException {
         validateUserData(userDto);
         return userRepository.createUser(userDto);
     }
 
     @Override
-    public User updateUser(Long userId, UserDto userDto) {
+    public User updateUser(Long userId, UserDto userDto) throws NotFoundException, ValidationException, DuplicateException {
         validateUserDataForUpdate(userDto, userId);
         return userRepository.updateUser(userId, userDto);
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getUserById(Long id) throws NotFoundException {
         return userRepository.getUserById(id).orElseThrow(() -> new NotFoundException("Пользователь с " + id + " не найден"));
     }
 
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateUserDataForUpdate(UserDto userDto, long userId) {
+    private void validateUserDataForUpdate(UserDto userDto, long userId) throws NotFoundException, ValidationException, DuplicateException {
         if (!userRepository.isExistUserById(userId))
             throw new NotFoundException("Пользователь с id = " + userId + " не существует.");
 
