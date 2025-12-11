@@ -1,14 +1,15 @@
 package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
+@ToString
 @EqualsAndHashCode(of = "id")
 @Builder
 public class ItemBookingDto {
