@@ -8,7 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @RequiredArgsConstructor
+@NoArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
 @Builder
