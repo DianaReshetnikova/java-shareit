@@ -89,15 +89,28 @@ public class BookingServiceImpl implements BookingService {
         User booker = userService.getUserById(userId);
         BookingState bookingState = validateBookingState(state);
 
-        List<Booking> bookings = switch (bookingState) {
-            case ALL -> bookingRepository.findByBookerIdOrderByStartDesc(userId);
-            case CURRENT -> bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
-                    LocalDateTime.now(), LocalDateTime.now());
-            case PAST -> bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
-            case FUTURE -> bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
-            case WAITING -> bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
-            case REJECTED -> bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
-        };
+        List<Booking> bookings = null;
+        switch (bookingState) {
+            case ALL:
+                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                break;
+            case CURRENT:
+                bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
+                        LocalDateTime.now(), LocalDateTime.now());
+                break;
+            case PAST:
+                bookings = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookings = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case WAITING:
+                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                break;
+        }
 
         return bookings == null ? new ArrayList<>() : bookings;
     }
@@ -107,15 +120,28 @@ public class BookingServiceImpl implements BookingService {
         User booker = userService.getUserById(userId);
         BookingState bookingState = validateBookingState(state);
 
-        List<Booking> bookings = switch (bookingState) {
-            case ALL -> bookingRepository.findByOwnerIdAllBookingOfItems(userId);
-            case CURRENT -> bookingRepository.findByOwnerIdCurrentBookingsOfItems(userId,
-                    LocalDateTime.now(), LocalDateTime.now());
-            case PAST -> bookingRepository.findByOwnerIdPastBookingsOfItems(userId, LocalDateTime.now());
-            case FUTURE -> bookingRepository.findByOwnerIdFutureBookingsOfItems(userId, LocalDateTime.now());
-            case WAITING -> bookingRepository.findByOwnerIdAndStatusBookingsOfItems(userId, BookingStatus.WAITING);
-            case REJECTED -> bookingRepository.findByOwnerIdAndStatusBookingsOfItems(userId, BookingStatus.REJECTED);
-        };
+        List<Booking> bookings = null;
+        switch (bookingState) {
+            case ALL:
+                bookings = bookingRepository.findByOwnerIdAllBookingOfItems(userId);
+                break;
+            case CURRENT:
+                bookings = bookingRepository.findByOwnerIdCurrentBookingsOfItems(userId,
+                        LocalDateTime.now(), LocalDateTime.now());
+                break;
+            case PAST:
+                bookings = bookingRepository.findByOwnerIdPastBookingsOfItems(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookings = bookingRepository.findByOwnerIdFutureBookingsOfItems(userId, LocalDateTime.now());
+                break;
+            case WAITING:
+                bookings = bookingRepository.findByOwnerIdAndStatusBookingsOfItems(userId, BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findByOwnerIdAndStatusBookingsOfItems(userId, BookingStatus.REJECTED);
+                break;
+        }
 
         return bookings == null ? new ArrayList<>() : bookings;
     }
