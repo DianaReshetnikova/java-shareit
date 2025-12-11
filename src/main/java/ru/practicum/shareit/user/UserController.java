@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.DuplicateException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
@@ -20,19 +21,22 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<User> getUsers() {
-        return userService.getUsers();
+    public List<UserDto> getUsers() {
+        return userService.getUsers()
+                .stream()
+                .map(UserMapper::mapToUserDto)
+                .toList();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody UserDto newUser) throws DuplicateException, ValidationException {
-        return userService.createUser(newUser);
+    public UserDto createUser(@RequestBody UserDto newUser) throws DuplicateException, ValidationException {
+        return UserMapper.mapToUserDto(userService.createUser(newUser));
     }
 
     @PatchMapping("/{userId}")
-    public User updateUser(@PathVariable("userId") Long userId, @RequestBody UserDto user) throws NotFoundException, ValidationException, DuplicateException {
-        return userService.updateUser(userId, user);
+    public UserDto updateUser(@PathVariable("userId") Long userId, @RequestBody UserDto user) throws NotFoundException, ValidationException, DuplicateException {
+        return UserMapper.mapToUserDto(userService.updateUser(userId, user));
     }
 
     @DeleteMapping("/{userId}")
@@ -42,7 +46,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public User getUserById(@PathVariable("userId") Long id) throws NotFoundException {
-        return userService.getUserById(id);
+    public UserDto getUserById(@PathVariable("userId") Long id) throws NotFoundException {
+        return UserMapper.mapToUserDto(userService.getUserById(id));
     }
 }

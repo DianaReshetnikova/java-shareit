@@ -8,6 +8,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
@@ -19,37 +20,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsers() {
-        return userRepository.getUsers();
+        return userRepository.findAll();
     }
 
     @Override
     public User createUser(UserDto userDto) throws DuplicateException, ValidationException {
-        validateUserData(userDto);
-        return userRepository.createUser(userDto);
+        validateUserDataForInsert(userDto);
+        return userRepository.save(UserMapper.mapToUser(userDto));
     }
 
     @Override
     public User updateUser(Long userId, UserDto userDto) throws NotFoundException, ValidationException, DuplicateException {
         validateUserDataForUpdate(userDto, userId);
-        return userRepository.updateUser(userId, userDto);
+        userDto.setId(userId);
+        return userRepository.save(UserMapper.mapToUser(userDto));
     }
 
     @Override
     public User getUserById(Long id) throws NotFoundException {
-        return userRepository.getUserById(id).orElseThrow(() -> new NotFoundException("Пользователь с " + id + " не найден"));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь с " + id + " не найден"));
     }
 
     @Override
     public void deleteUserById(Long id) {
-        userRepository.deleteUserById(id);
+        userRepository.deleteById(id);
     }
 
-    private void validateUserData(UserDto userDto) throws DuplicateException, ValidationException {
+    private void validateUserDataForInsert(UserDto userDto) throws DuplicateException, ValidationException {
         // true, если строка не равна null, её длина больше 0 и она содержит хотя бы один непустой символ.
         if (!StringUtils.hasText(userDto.getName()) || !StringUtils.hasText(userDto.getEmail())) {
             throw new ValidationException("Поля name или email не заполнены.");
         }
-        if (userRepository.isExistEmail(userDto.getEmail())) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new DuplicateException("Пользователь с email = " + userDto.getEmail() + " уже существует.");
         }
         if (!userDto.getEmail().contains("@")) {
@@ -58,13 +60,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateUserDataForUpdate(UserDto userDto, long userId) throws NotFoundException, ValidationException, DuplicateException {
-        if (!userRepository.isExistUserById(userId))
+        if (!userRepository.existsById(userId))
             throw new NotFoundException("Пользователь с id = " + userId + " не существует.");
 
         if (StringUtils.hasText(userDto.getEmail()) && !userDto.getEmail().contains("@")) {
             throw new ValidationException("Указан некорректный email = " + userDto.getEmail() + ".");
         }
-        if (StringUtils.hasText(userDto.getEmail()) && userRepository.isExistEmail(userDto.getEmail())) {
+        if (StringUtils.hasText(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
             throw new DuplicateException("Пользователь с email = " + userDto.getEmail() + " уже существует.");
         }
     }

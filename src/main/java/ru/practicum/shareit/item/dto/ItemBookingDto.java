@@ -4,14 +4,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(of = "id")
 @Builder
-public class ItemDto {
+public class ItemBookingDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     private String name;
     private String description;
     private Boolean available;
+    private BookingShortDto lastBooking;
+    private BookingShortDto nextBooking;
+    private List<CommentResponseDto> comments;
 }
