@@ -1,14 +1,30 @@
 package ru.practicum.shareit.user;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "email")
 @Builder
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name")
     private String name;
-    private String email;//по ТЗ два пользователя не могут иметь одинаковый адрес электронной почты
+
+    @Column(name = "email", unique = true)
+    private String email;
+
+
+    public User(Long userId) {
+        id = userId;
+    }
 }

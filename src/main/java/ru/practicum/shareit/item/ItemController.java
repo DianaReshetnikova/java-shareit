@@ -5,7 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
+import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
@@ -19,27 +24,35 @@ public class ItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") long userId) throws NotFoundException {
+    public List<ItemBookingDto> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") long userId) throws NotFoundException {
         return itemService.getItemsByOwner(userId);
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
-        return itemService.createItem(userId, itemDto);
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
+        return ItemMapper.mapToItemDto(itemService.createItem(userId, itemDto));
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId, @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
-        return itemService.updateItem(userId, itemId, itemDto);
+    public ItemDto updateItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
+        return ItemMapper.mapToItemDto(itemService.updateItem(userId, itemId, itemDto));
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) throws NotFoundException {
-        return itemService.getItemById(itemId);
+    public ItemBookingDto getItemById(@PathVariable Long itemId) throws NotFoundException {
+        return itemService.getItemBookingDtoById(itemId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchForItems(@RequestParam String text) {
-        return itemService.searchForItems(text);
+        return itemService.searchForItems(text).stream()
+                .map(ItemMapper::mapToItemDto)
+                .toList();
+    }
+
+    //Пользователи могут оставлять отзывы на те вещи, которые брали в аренду
+    @PostMapping("/{itemId}/comment")
+    public CommentResponseDto postComment(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody CommentCreateDto commentCreate) throws ValidationException, NotFoundException {
+        return CommentMapper.mapToCommentResponseDto(itemService.postComment(itemId, userId, commentCreate));
     }
 }
