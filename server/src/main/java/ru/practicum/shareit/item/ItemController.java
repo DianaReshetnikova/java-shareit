@@ -29,12 +29,16 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto)
+            throws NotFoundException, ValidationException {
         return ItemMapper.mapToItemDto(itemService.createItem(userId, itemDto));
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
+    public ItemDto updateItemById(@PathVariable Long itemId,
+                                  @RequestHeader("X-Sharer-User-Id") Long userId,
+                                  @RequestBody ItemDto itemDto) throws NotFoundException, ValidationException {
         return ItemMapper.mapToItemDto(itemService.updateItem(userId, itemId, itemDto));
     }
 
@@ -52,7 +56,9 @@ public class ItemController {
 
     //Пользователи могут оставлять отзывы на те вещи, которые брали в аренду
     @PostMapping("/{itemId}/comment")
-    public CommentResponseDto postComment(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody CommentCreateDto commentCreate) throws ValidationException, NotFoundException {
+    public CommentResponseDto postComment(@PathVariable Long itemId,
+                                          @RequestHeader("X-Sharer-User-Id") Long userId,
+                                          @RequestBody CommentCreateDto commentCreate) throws ValidationException, NotFoundException {
         return CommentMapper.mapToCommentResponseDto(itemService.postComment(itemId, userId, commentCreate));
     }
 }

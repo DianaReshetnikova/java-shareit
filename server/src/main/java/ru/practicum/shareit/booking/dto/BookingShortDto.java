@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@Builder
+@Builder(toBuilder = true)
 public class BookingShortDto {
     private Long id;
     private LocalDateTime start;

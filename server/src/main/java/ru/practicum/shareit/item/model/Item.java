@@ -13,7 +13,7 @@ import ru.practicum.shareit.user.User;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

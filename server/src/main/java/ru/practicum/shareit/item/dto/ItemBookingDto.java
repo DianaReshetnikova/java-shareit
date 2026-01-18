@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-@Builder
+@Builder(toBuilder = true)
 public class ItemBookingDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
