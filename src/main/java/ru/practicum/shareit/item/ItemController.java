@@ -24,7 +24,7 @@ public class ItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemBookingDto> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") long userId) throws NotFoundException {
+    public List<ItemBookingDto> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") Long userId) throws NotFoundException {
         return itemService.getItemsByOwner(userId);
     }
 

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.NotFound;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -16,6 +17,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
@@ -31,6 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public List<ItemBookingDto> getItemsByOwner(Long userId) throws NotFoundException {
@@ -62,7 +66,13 @@ public class ItemServiceImpl implements ItemService {
         validateUserById(userId);
         validateItemData(itemDto);
 
-        return itemRepository.save(ItemMapper.mapToItem(itemDto, userId));
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос с id = " + itemDto.getRequestId() + " не найден."));
+        }
+
+        return itemRepository.save(ItemMapper.mapToItem(itemDto, userId, itemRequest));
     }
 
     @Override
@@ -79,6 +89,14 @@ public class ItemServiceImpl implements ItemService {
             item.setDescription(itemDto.getDescription());
         if (itemDto.getAvailable() != null)
             item.setAvailable(itemDto.getAvailable());
+
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос с id = " + itemDto.getRequestId() + " не найден."));
+
+            item.setItemRequest(itemRequest);
+        }
 
         return itemRepository.save(item);
     }
@@ -125,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден.");
     }
 
-    private void validateItemData(ItemDto itemDto) throws ValidationException {
+    private void validateItemData(ItemDto itemDto) throws ValidationException, NotFoundException {
         if (!StringUtils.hasText(itemDto.getName())
                 || !StringUtils.hasText(itemDto.getDescription())
                 || itemDto.getAvailable() == null)

@@ -12,13 +12,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidation(final ValidationException e) {
-        return Map.of("ValidationException Error", e.getMessage());
+        return Map.of("error", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(final NotFoundException e) {
-        return Map.of("NotFoundException Error", e.getMessage());
+        return Map.of("error", e.getMessage());
     }
 
     @ExceptionHandler
@@ -30,6 +30,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleDuplicate(final DuplicateException e) {
-        return Map.of("DuplicateException Error", e.getMessage());
+        return Map.of("error", e.getMessage());
     }
 }

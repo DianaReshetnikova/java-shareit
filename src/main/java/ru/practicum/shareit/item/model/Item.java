@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 @Entity
@@ -31,6 +32,9 @@ public class Item {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-//    private Long itemRequestId;//если вещь была создана по запросу другого пользователя, то в этом
+    //если вещь была создана по запросу другого пользователя, то в этом
     //поле будет храниться ссылка на соответствующий запрос
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_request_id", nullable = true)
+    private ItemRequest itemRequest;
 }
