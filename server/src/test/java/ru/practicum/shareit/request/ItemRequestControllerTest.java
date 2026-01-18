@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @WebMvcTest(controllers = ItemRequestController.class)
 public class ItemRequestControllerTest {
-    private final static String PATH = "/requests";
+    private static final String PATH = "/requests";
 
     @Autowired
     ObjectMapper mapper;

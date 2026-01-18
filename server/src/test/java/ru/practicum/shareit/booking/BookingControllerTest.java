@@ -9,7 +9,7 @@ import ru.practicum.shareit.booking.service.BookingService;
 
 @WebMvcTest(controllers = BookingController.class)
 public class BookingControllerTest {
-    private final static String PATH = "/bookings";
+    private static final String PATH = "/bookings";
 
     @MockBean
     BookingService bookingService;

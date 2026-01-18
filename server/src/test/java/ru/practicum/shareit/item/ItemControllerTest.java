@@ -20,8 +20,6 @@ import ru.practicum.shareit.user.User;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @WebMvcTest(controllers = ItemController.class)
 public class ItemControllerTest {
-    private final static String PATH = "/items";
+    private static final String PATH = "/items";
 
     @Autowired
     ObjectMapper mapper;
@@ -131,8 +129,8 @@ public class ItemControllerTest {
                 .andReturn();
 
         List<ItemDto> itemsDto = items.stream()
-                        .map(ItemMapper::mapToItemDto)
-                                .collect(Collectors.toList());
+                .map(ItemMapper::mapToItemDto)
+                .collect(Collectors.toList());
 
         assertEquals(mapper.writeValueAsString(itemsDto), result.getResponse().getContentAsString());
 

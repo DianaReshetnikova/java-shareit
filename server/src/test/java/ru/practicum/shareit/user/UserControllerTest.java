@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = UserController.class)
 public class UserControllerTest {
-    private final static String PATH = "/users";
+    private static final String PATH = "/users";
 
     @Autowired
     ObjectMapper mapper;
