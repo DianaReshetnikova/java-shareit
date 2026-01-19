@@ -20,7 +20,6 @@ import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -141,7 +140,7 @@ public class ItemServiceImpl implements ItemService {
 
 
 
-    private void validateItemData(ItemDto itemDto) throws ValidationException, NotFoundException {
+    private void validateItemData(ItemDto itemDto) throws ValidationException {
         if (!StringUtils.hasText(itemDto.getName())
                 || !StringUtils.hasText(itemDto.getDescription())
                 || itemDto.getAvailable() == null)
