@@ -31,9 +31,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long userId, UserDto userDto) throws NotFoundException, ValidationException, DuplicateException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с " + userId + " не найден"));
+
         validateUserDataForUpdate(userDto, userId);
+
+        if (userDto.getEmail() != null)
+            user.setEmail(userDto.getEmail());
+        if (userDto.getName() != null)
+            user.setName(userDto.getName());
+
         userDto.setId(userId);
-        return userRepository.save(UserMapper.mapToUser(userDto));
+        return userRepository.save(user);
     }
 
     @Override
@@ -59,14 +68,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateUserDataForUpdate(UserDto userDto, long userId) throws NotFoundException, ValidationException, DuplicateException {
-        if (!userRepository.existsById(userId))
-            throw new NotFoundException("Пользователь с id = " + userId + " не существует.");
-
+    private void validateUserDataForUpdate(UserDto userDto, Long userId) throws ValidationException, DuplicateException {
         if (StringUtils.hasText(userDto.getEmail()) && !userDto.getEmail().contains("@")) {
             throw new ValidationException("Указан некорректный email = " + userDto.getEmail() + ".");
         }
-        if (StringUtils.hasText(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
+        if (StringUtils.hasText(userDto.getEmail()) && userRepository.existsByEmailAndIdNot(userDto.getEmail(), userId)) {
             throw new DuplicateException("Пользователь с email = " + userDto.getEmail() + " уже существует.");
         }
     }

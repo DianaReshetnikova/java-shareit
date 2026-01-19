@@ -30,14 +30,14 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public List<ItemBookingDto> getItemsByOwner(Long userId) throws NotFoundException {
-        validateUserById(userId);
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не найден."));
 
         List<ItemBookingDto> listItemBookings = itemRepository.findAllByOwnerId(userId)
                 .stream()
@@ -62,7 +62,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item createItem(Long userId, ItemDto itemDto) throws NotFoundException, ValidationException {
-        validateUserById(userId);
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не найден."));
+
         validateItemData(itemDto);
 
         ItemRequest itemRequest = null;
@@ -71,12 +73,13 @@ public class ItemServiceImpl implements ItemService {
                     .orElseThrow(() -> new NotFoundException("Запрос с id = " + itemDto.getRequestId() + " не найден."));
         }
 
-        return itemRepository.save(ItemMapper.mapToItem(itemDto, userId, itemRequest));
+        return itemRepository.save(ItemMapper.mapToItem(itemDto, owner, itemRequest));
     }
 
     @Override
     public Item updateItem(Long userId, Long itemId, ItemDto itemDto) throws NotFoundException, ValidationException {
-        validateUserById(userId);
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не найден."));
 
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Вещь с id = " + itemId + " не найдена."));
         if (!item.getOwner().getId().equals(userId))
@@ -137,10 +140,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    private void validateUserById(Long userId) throws NotFoundException {
-        if (userId == null || !userRepository.existsById(userId))
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден.");
-    }
 
     private void validateItemData(ItemDto itemDto) throws ValidationException, NotFoundException {
         if (!StringUtils.hasText(itemDto.getName())

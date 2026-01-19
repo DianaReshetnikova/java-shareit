@@ -20,12 +20,12 @@ public final class ItemMapper {
                 .build();
     }
 
-    public static Item mapToItem(ItemDto itemDto, Long ownerId, ItemRequest itemRequest) {
+    public static Item mapToItem(ItemDto itemDto, User owner, ItemRequest itemRequest) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
-                .owner(new User(ownerId))
+                .owner(owner)
                 .available(itemDto.getAvailable())
                 .itemRequest(itemRequest)
                 .build();
