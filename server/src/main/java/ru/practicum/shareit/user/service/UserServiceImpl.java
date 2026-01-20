@@ -1,0 +1,79 @@
+package ru.practicum.shareit.user.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import ru.practicum.shareit.exception.DuplicateException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.repository.UserRepository;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+
+    @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User createUser(UserDto userDto) throws DuplicateException, ValidationException {
+        validateUserDataForInsert(userDto);
+        return userRepository.save(UserMapper.mapToUser(userDto));
+    }
+
+    @Override
+    public User updateUser(Long userId, UserDto userDto) throws NotFoundException, ValidationException, DuplicateException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с " + userId + " не найден"));
+
+        validateUserDataForUpdate(userDto, userId);
+
+        if (userDto.getEmail() != null)
+            user.setEmail(userDto.getEmail());
+        if (userDto.getName() != null)
+            user.setName(userDto.getName());
+
+        userDto.setId(userId);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User getUserById(Long id) throws NotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь с " + id + " не найден"));
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    private void validateUserDataForInsert(UserDto userDto) throws DuplicateException, ValidationException {
+        // true, если строка не равна null, её длина больше 0 и она содержит хотя бы один непустой символ.
+        if (!StringUtils.hasText(userDto.getName()) || !StringUtils.hasText(userDto.getEmail())) {
+            throw new ValidationException("Поля name или email не заполнены.");
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new DuplicateException("Пользователь с email = " + userDto.getEmail() + " уже существует.");
+        }
+        if (!userDto.getEmail().contains("@")) {
+            throw new ValidationException("Указан некорректный email = " + userDto.getEmail() + ".");
+        }
+    }
+
+    private void validateUserDataForUpdate(UserDto userDto, Long userId) throws ValidationException, DuplicateException {
+        if (StringUtils.hasText(userDto.getEmail()) && !userDto.getEmail().contains("@")) {
+            throw new ValidationException("Указан некорректный email = " + userDto.getEmail() + ".");
+        }
+        if (StringUtils.hasText(userDto.getEmail()) && userRepository.existsByEmailAndIdNot(userDto.getEmail(), userId)) {
+            throw new DuplicateException("Пользователь с email = " + userDto.getEmail() + " уже существует.");
+        }
+    }
+}
